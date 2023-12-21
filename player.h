@@ -17,11 +17,11 @@ typedef struct {
     char name[MAX_PLAYER_NAME];
     int accumCredit;
     int flag_graduate;
-} Player;
+} player_t;
 
 // Function prototypes for player operations
 void initializePlayer(Player *player, const char *name, int initEnergy);
-void movePlayer(Player *player, int steps);
+void goFoward(Player *player, int step);
 void updatePlayerStatus(Player *player);
 // ... other player-related functions
 

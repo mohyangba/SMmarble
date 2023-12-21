@@ -22,8 +22,8 @@ static char smmNodeName[MAX_NODETYPE][MAX_CHARNAME] = {
     "Lecture",
     "Restaurant",
     "Lab",
-    "Home",
-    "Move to lab",
+    "House",
+    "Experiment",
     "Snacktime",
     "Mission"
 };

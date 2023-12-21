@@ -57,6 +57,7 @@ float calcAverageGrade(int player); //calculate average grade of the player
 smmGrade_e takeLecture(int player, char *lectureName, int credit); //take the lecture (insert a grade of the player)
 void* findGrade(int player, char *lectureName); //find the grade from the player's grade history
 void printGrades(int player); //print all the grade history of the player
+void actionNode(int player) // 플레이어가 특정 노드 위에 도착했을 때 취하는 행동 구현 
 #endif
 
 
@@ -127,12 +128,13 @@ int rolldie(int player)
 //action code when a player stays at a node
 void actionNode(int player)
 {
+     //노드 검색 
     void *boardPtr = smmdb_getData(LISTNO_NODE, cur_player[player].position );
     //int type = smmObj_getNodeType( cur_player[player].position );
     int type = smmObj_getNodeType( boardPtr );
     char *name = smmObj_getNodeName( boardPtr );
     void *gradePtr;
-    
+     //노드별 액션 처리 
     switch(type)
     {
         //case lecture:
@@ -151,31 +153,31 @@ void actionNode(int player)
             
             break;
         
-        case RESTAURANT_NODE:
+        case SMMNODE_TYPE_RESTAURANT:
             // Draw a random food card and replenish energy
             drawFoodCardAndReplenishEnergy(player);
             break;
         
-        case LABORATORY_NODE:
+        case SMMNODE_TYPE_LAB:
             // Laboratory logic: no action if just arrived
             break;
         
-        case HOUSE_NODE:
+        case SMMNODE_TYPE_HOUSE:
             // Replenish energy every time player passes the house
             replenishEnergyAtHouse(player);
             break;
         
-        case EXPERIMENT_NODE:
+        case SMMNODE_TYPE_EXPERIMENT:
             // Handle experiment logic: spend energy, conduct experiment
             performExperiment(player);
             break;
         
-        case SNACK_TIME_NODE:
+        case SMMNODE_TYPE_SNACKTIME:
             // Similar to Restaurant: draw a random food card for energy
             drawFoodCardAndReplenishEnergy(player);
             break;
         
-        case MISSION_NODE:
+        case SMMNODE_TYPE_MISSION:
             // Random mission logic: implement various missions
             performRandomMission(player);
             break;
@@ -264,7 +266,7 @@ int main(int argc, const char * argv[]) {
     }
     //printf("(%s)", smmObj_getTypeName(SMMNODE_TYPE_LECTURE));
     
-    #if 0
+    
     //2. food card config 
     if ((fp = fopen(FOODFILEPATH,"r")) == NULL)
     {
@@ -279,25 +281,6 @@ int main(int argc, const char * argv[]) {
     }
     fclose(fp);
     printf("Total number of food cards : %i\n", food_nr);
-    
-    
-    
-    //3. festival card config 
-    if ((fp = fopen(FESTFILEPATH,"r")) == NULL)
-    {
-        printf("[ERROR] failed to open %s. This file should be in the same directory of SMMarble.exe.\n", FESTFILEPATH);
-        return -1;
-    }
-    
-    printf("\n\nReading festival card component......\n");
-    while () //read a festival card string
-    {
-        //store the parameter set
-    }
-    fclose(fp);
-    printf("Total number of festival cards : %i\n", festival_nr);
-    #endif
-    
     
     //2. Player configuration ---------------------------------------------------------------------------------
     
