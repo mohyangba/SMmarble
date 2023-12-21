@@ -103,8 +103,17 @@ void actionNode(int player)
             break;
         
         case SMMNODE_TYPE_EXPERIMENT:
-            // Handle experiment logic: spend energy, conduct experiment
-            performExperiment(player);
+         performExperiment(player);
+
+        // 실험중 상태에 있는지 아닌지 확인 
+        if (!cur_player[player].inExperiment) {
+           // 이제 실험 중 상태를 벗어낫으니까 주사위를 새로 굴린다 
+           int diceRoll = rolldie(player);
+           printf("Player %s rolls a %d and moves forward.\n", cur_player[player].name, diceRoll);
+
+           // Assuming you have a function to move the player based on dice roll
+           goFoward(player, diceRoll);
+           }
             break;
         
         case SMMNODE_TYPE_SNACKTIME:

@@ -16,6 +16,7 @@ typedef struct player{
     char name[MAX_PLAYER_NAME];
     int accumCredit;
     int flag_graduate;
+    int inExperiment; //실험중 상태 
 } player_t;
 
 // Function prototypes for player operations
