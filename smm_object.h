@@ -10,11 +10,11 @@
 
 #define SMMNODE_TYPE_LECTURE            0
 #define SMMNODE_TYPE_RESTAURANT         1
-#define SMMNODE_TYPE_LABORATORY         2
-#define SMMNODE_TYPE_HOME               3
-#define SMMNODE_TYPE_GOTOLAB            4
+#define SMMNODE_TYPE_LAB                2
+#define SMMNODE_TYPE_HOUSE              3
+#define SMMNODE_TYPE_ECPERIMENT         4
 #define SMMNODE_TYPE_FOODCHANCE         5
-#define SMMNODE_TYPE_FESTIVAL           6
+#define SMMNODE_TYPE_MISSION            6
 
 #define SMMNODE_TYPE_MAX                7
 
@@ -36,16 +36,6 @@ smmFoodCard_t* smmObj_genFoodCard(char* name, int energy);
 void loadFoodCards(const char* filename);
 smmFoodCard_t* getRandomFoodCard();
 void freeFoodCards();
-
-/* node type :
-    lecture,
-    restaurant,
-    laboratory,
-    home,
-    experiment,
-    foodChance,
-    festival
-*/
 
 
 /* grade :

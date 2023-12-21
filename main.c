@@ -29,15 +29,6 @@ static int festival_nr;
 
 static int player_nr;
 
-
-typedef struct player {
-        int energy; 
-        int position;
-        char name[MAX_CHARNAME];
-        int accumCredit;
-        int flag_graduate;
-} player_t;
-
 static player_t *cur_player;
 //static player_t cur_player[MAX_PLAYER];
 
@@ -58,9 +49,43 @@ smmGrade_e takeLecture(int player, char *lectureName, int credit); //take the le
 void* findGrade(int player, char *lectureName); //find the grade from the player's grade history
 void printGrades(int player); //print all the grade history of the player
 void actionNode(int player) // 플레이어가 특정 노드 위에 도착했을 때 취하는 행동 구현 
+void endGame(void);//플레이어 승리 시 게임 종료  
 #endif
 
+void goForward(int player, int step)
+{
+     //플레이어의 현재 위치 업데이트
+     int oldPosition = cur_player[player].position;
+     cur_player[player].position += step;
+     
+     // Check if the player passed the Home node
+     bool passedHouse = (oldPosition < HOUSE_NODE_INDEX && cur_player[player].position >= HOUSE_NODE_INDEX) ||
+                      (cur_player[player].position >= board_nr && (oldPosition % board_nr) < HOUSE_NODE_INDEX);
+     
+     //마지막 노드를 지났는지 확인 ( 첫 노드로 돌아가기)
+      if (cur_player[player].position >= board_nr){
+        cur_player[player].position %= board_nr;
+        //루프 하나를 완료 했을 때 첫 노드로 돌아가기 
+        }
+      
+      // 졸업여부확인
+      if(cur_player[player].accumCredit >= GRADUATE_CREDIT && passedHouse){
+        
+        //졸업했고, 하우스 노드에 도달(지나치면) 게임 종료 
+        printf("%s has won the game!\n", cur_player[player].name);
+        
+        endGame();
+        return;
+        } 
+        //기타 조건 추가할 경우 
+} 
 
+void endGame() {
+    // Display final scores or messages
+    // Clean up resources if needed
+    // Ask if players want to play again or exit the game
+}                        
+     
 void printGrades(int player)
 {
      int i;
