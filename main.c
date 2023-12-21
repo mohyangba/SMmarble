@@ -6,6 +6,7 @@
 //
 
 #include <time.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -49,7 +50,73 @@ void actionNode(int player) // 플레이어가 특정 노드 위에 도착했을 때 취하는 행동
 void endGame(void);//플레이어 승리 시 게임 종료  
 #endif
 
+void loadBoardConfig(const char* filepath) {
+    FILE* fp;
+    char name[MAX_CHARNAME];
+    int type, credit, energy;
+
+    fp = fopen(filepath, "r");
+    if (fp == NULL) {
+        fprintf(stderr, "Failed to open board configuration file: %s\n", filepath);
+        exit(EXIT_FAILURE);
+    }
+
+    while (fscanf(fp, "%s %d %d %d", name, &type, &credit, &energy) == 4) {
+        // Here, create a new board object and add it to your board data structure
+        void* boardObj = smmObj_genObject(name, smmObjType_board, type, credit, energy, 0);
+        smmdb_addTail(LISTNO_NODE, boardObj);
+    }
+
+    if (ferror(fp)) {
+        fprintf(stderr, "Error reading from file: %s\n", filepath);
+        fclose(fp);
+        exit(EXIT_FAILURE);
+    }
+
+    fclose(fp);
+}
                    
+                   
+static smmFoodCard_t* foodCards[MAX_FOOD_CARDS];
+static int foodCardCount = 0;
+
+void loadFoodCards(const char* filepath) {
+    FILE* file = fopen(filepath, "r");
+    if (!file) {
+        fprintf(stderr, "Error opening food cards file: %s\n", filepath);
+        exit(EXIT_FAILURE);
+    }
+
+    char foodName[MAX_CHARNAME];
+    int energy;
+    while (foodCardCount < MAX_FOOD_CARDS && fscanf(file, "%s %d", foodName, &energy) == 2) {
+        foodCards[foodCardCount++] = smmObj_genFoodCard(foodName, energy);
+    }
+
+    if (ferror(file)) {
+        fprintf(stderr, "Error reading from food cards file: %s\n", filepath);
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
+
+    fclose(file);
+}
+
+// Function to get a random food card - assumes `srand` has been called
+smmFoodCard_t* getRandomFoodCard() {
+    if (foodCardCount == 0) return NULL;
+    int index = rand() % foodCardCount;
+    return foodCards[index];
+}
+
+// Function to free allocated food cards
+void freeFoodCards() {
+    for (int i = 0; i < foodCardCount; i++) {
+        free(foodCards[i]);
+    }
+    foodCardCount = 0;
+}
+
 int rolldie(int player)
 {
     char c;
@@ -82,99 +149,58 @@ int main(int argc, const char * argv[]) {
     festival_nr = 0;
     
     srand(time(NULL));
-    //foodcard need to be loaded
-    void loadFoodCards(const char* filename)
-    //1. import parameters ---------------------------------------------------------------------------------
-    //1-1. boardConfig 
-    if ((fp = fopen(BOARDFILEPATH,"r")) == NULL)
-    {
-        printf("[ERROR] failed to open %s. This file should be in the same directory of SMMarble.exe.\n", BOARDFILEPATH);
-        getchar();
-        return -1;
-    }
-    
-    printf("Reading board component......\n");
-    while ( fscanf(fp, "%s %i %i %i", name, &type, &credit, &energy) == 4 ) //read a node parameter set
-    {
-        //store the parameter set
-        //(char* name, smmObjType_e objType, int type, int credit, int energy, smmObjGrade_e grade)
-        void *boardObj = smmObj_genObject(name, smmObjType_board, type, credit, energy, 0);
-        smmdb_addTail(LISTNO_NODE, boardObj);
-        
-        if (type == SMMNODE_TYPE_HOME)
-           initEnergy = energy;
-        board_nr++;
-    }
-    fclose(fp);
-    printf("Total number of board nodes : %i\n", board_nr);
+    //foodcard&board need to be loaded
+    loadBoardConfig(BOARDFILEPATH);
+    loadFoodCards(FOODFILEPATH);
     
     
-    for (i = 0;i<board_nr;i++)
-    {
-        void *boardObj = smmdb_getData(LISTNO_NODE, i);
-        
-        printf("node %i : %s, %i(%s), credit %i, energy %i\n", 
-                     i, smmObj_getNodeName(boardObj), 
-                     smmObj_getNodeType(boardObj), smmObj_getTypeName(smmObj_getNodeType(boardObj)),
-                     smmObj_getNodeCredit(boardObj), smmObj_getNodeEnergy(boardObj));
-    }
-    //printf("(%s)", smmObj_getTypeName(SMMNODE_TYPE_LECTURE));
-    
-    
-    //2. food card config 
-    if ((fp = fopen(FOODFILEPATH,"r")) == NULL)
-    {
-        printf("[ERROR] failed to open %s. This file should be in the same directory of SMMarble.exe.\n", FOODFILEPATH);
-        return -1;
-    }
-    
-    printf("\n\nReading food card component......\n");
-    while () //read a food parameter set
-    {
-        //store the parameter set
-    }
-    fclose(fp);
-    printf("Total number of food cards : %i\n", food_nr);
-    
-    //2. Player configuration ---------------------------------------------------------------------------------
-    
-    do
-    {
-        //input player number to player_nr
-        printf("input player no.:");
+    // Player configuration
+    printf("Enter the number of players: ");
+    scanf("%d", &player_nr);
+    while (player_nr < 1 || player_nr > MAX_PLAYER) {
+        printf("Invalid number of players. Please enter a number between 1 and %d: ", MAX_PLAYER);
         scanf("%d", &player_nr);
-        fflush(stdin);
     }
-    while (player_nr < 0 || player_nr >  MAX_PLAYER);
-    
-    cur_player = (player_t*)malloc(player_nr*sizeof(player_t));
-    generatePlayers(player_nr, initEnergy);
-    
-    
-    //3. SM Marble game starts ---------------------------------------------------------------------------------
-    while (1) //is anybody graduated? 게임이 종료되지 않을 조건  
-    {
-        int die_result;
-        
-        //GAME LOOP
-        //4-1. initial printing
-        printPlayerStatus();
-        
-        //4-2. die rolling (if not in experiment)        
-        die_result = rolldie(turn);
-        
-        //4-3. go forward
-        goForward(turn, die_result);
 
-		//4-4. take action at the destination node of the board
-        actionNode(turn);
-        
-        //4-5. next turn
-        turn = (turn + 1)%player_nr;
+    cur_player = (player_t*)malloc(player_nr * sizeof(player_t));
+    if (!cur_player) {
+        perror("Failed to allocate memory for players");
+        return -1;
     }
-    
-    
+
+    // Initialize players
+    for (int i = 0; i < player_nr; i++) {
+        initializePlayer(&cur_player[i], i); // Assuming this function prompts for player name and initializes the player
+    }
+
+    // Main game loop
+    while (1) { //조건 게임종료 X 
+        printf("\nPlayer %s's turn.\n", cur_player[turn].name);
+
+        // Player rolls die and moves
+        int die_result = rolldie(&cur_player[turn]);
+        goForward(&cur_player[turn], die_result);
+
+        // Perform action at the current node
+        actionNode(&cur_player[turn]);
+
+        // Print player's updated status
+        printPlayerStatus(&cur_player[turn]);
+
+        // Check for game end condition (e.g., graduation)
+        if (isGraduated(&cur_player[turn])) {
+            printf("%s has graduated and wins the game!\n", cur_player[turn].name);
+            break; // End the game loop
+        }
+
+        // Next player's turn
+        turn = (turn + 1) % player_nr;
+    }
+
+    // Clean up
     free(cur_player);
-    system("PAUSE");
+    freeFoodCards(); // Clean up food cards if necessary
+    printf("Game over. Thanks for playing!\n");
+
     return 0;
 }

@@ -44,52 +44,6 @@ smmFoodCard_t* smmObj_genFoodCard(char* name, int energy) {
     return card;
 }
 
-//음식 카드 관련 함수 정의  
-static smmFoodCard_t* foodCards[MAX_FOOD_CARDS];
-static int foodCardCount = 0;
-
-       //1)파일에서 음식 카드 불러오기 
-void loadFoodCards(const char* filename) {
-    FILE* file = fopen(filename, "r");
-    if (!file) {
-        perror("Error opening file");
-        return;
-    }
-
-    char foodName[MAX_CHARNAME];
-    int energy;
-
-    while (foodCardCount < MAX_FOOD_CARDS && fscanf(file, "%s %d", foodName, &energy) == 2) {
-        foodCards[foodCardCount++] = smmObj_genFoodCard(foodName, energy);
-    }
-
-    if (ferror(file)) {
-        fprintf(stderr, "Error reading from file: %s\n", filename);
-        fclose(file);
-        exit(EXIT_FAILURE); // or handle the error as per your game's design
-    }
-
-    fclose(file);
-}
-       //2}음식 카드 중 무작위 선택 (음식카드배열이 이미 채워져있다는 가정 하에)
-smmFoodCard_t* getRandomFoodCard() {
-    if (foodCardCount == 0) return NULL;
- 
-    int index = rand() % foodCardCount;
-    return foodCards[index];
-}
-       //3)음식 카드 사용이 필요하지 않은 경우 (게임 종료) = 메모리 정리
-void freeFoodCards() {
-    for (int i = 0; i < foodCardCount; i++) {
-        free(foodCards[i]);
-    }
-    foodCardCount = 0;
-}       
-
-
-static smmObject_t smm_node[MAX_NODE];
-static int smmObj_noNode = 0;
-
 //3. 관련 함수 변경 
 //object generation
 void* smmObj_genObject(char* name, smmObjType_e objType, int type, int credit, int energy, smmObjGrade_e grade)
