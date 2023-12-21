@@ -17,6 +17,7 @@ typedef struct player{
     int accumCredit;
     int flag_graduate;
     int inExperiment; //실험중 상태 
+    int successfulMissions; //미션 성공 
 } player_t;
 
 // Function prototypes for player operations

@@ -6,6 +6,8 @@
 #include "smm_object.h" 
 #include "player.h" 
 
+#define MISSION_STRING_LENGTH 8
+
 void drawFoodCardAndReplenishEnergy(int player) {
     smmFoodCard_t* card = getRandomFoodCard();
     if (card != NULL) {
@@ -37,9 +39,38 @@ void performExperiment(int player) {
     }
 }
 
-void performRandomMission(int player) {
-    // Logic to handle random missions
-    // ...
+const char missionChars[] = {'q', 'w', 'e', 'r', 'a', 's', 'd', 'f'};
+const int missionCharsCount = sizeof(missionChars) / sizeof(missionChars[0]);
+
+void performRandomMission(int playerIndex) {
+    char missionString[MISSION_STRING_LENGTH + 1];
+    char playerInput[MISSION_STRING_LENGTH + 1];
+
+    // Generate a random string from the specified set of characters
+    for (int i = 0; i < MISSION_STRING_LENGTH; i++) {
+        int randIndex = rand() % missionCharsCount;
+        missionString[i] = missionChars[randIndex];
+    }
+    missionString[MISSION_STRING_LENGTH] = '\0'; // Null-terminate the string
+
+    // Notify the player and get input
+    printf("Player %s has arrived at a Mission node. Replicate this string: %s\n", cur_player[playerIndex].name, missionString);
+    printf("Enter the string: ");
+    scanf("%s", playerInput);
+
+    // Check if the player replicated it correctly
+    if (strcmp(missionString, playerInput) == 0) {
+        cur_player[playerIndex].successfulMissions++;
+        printf("Correct! Total successful missions: %d\n", cur_player[playerIndex].successfulMissions);
+
+        // Check for three successful missions
+        if (cur_player[playerIndex].successfulMissions >= 3) {
+            printf("%s has completed three missions and wins the game!\n", cur_player[playerIndex].name);
+            endGame();
+        }
+    } else {
+        printf("Incorrect. Try again next time.\n");
+    }
 }
 
 //action code when a player stays at a node
