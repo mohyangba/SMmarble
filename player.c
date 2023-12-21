@@ -2,6 +2,7 @@
 //player.c
 //
 
+#include "smm_common.h"
 #include "player.h"
 
 void generatePlayers(int n, int initEnergy) //generate a new player
@@ -34,33 +35,41 @@ void initializePlayer(Player *player, const char *name) {
     player->flag_graduate = 0;
 }
 
+bool passesHouse(int oldPosition, int newPosition) {
+    // Check if the player's path from oldPosition to newPosition passes the house
+    if (oldPosition < HOUSE_NODE_INDEX && newPosition >= HOUSE_NODE_INDEX) {
+        return true; // Passed the house
+    } else if (newPosition < oldPosition && newPosition >= HOUSE_NODE_INDEX) {
+        // Case for looping past the last node back to the start
+        return true;
+    }
+    return false;
+}
+
 void goForward(Player *player, int step)
 {
      //플레이어의 현재 위치 업데이트
-     int oldPosition = cur_player[player].position; //업데이트 전에 정보 저장 
-     cur_player[player].position += step;
+     int oldPosition = player->position;
+    player->position = (oldPosition + step) % TOTAL_NODES;
      
-     // Check if the player passed the Home node
-     bool passedHouse = (oldPosition < HOUSE_NODE_INDEX && cur_player[player].position >= HOUSE_NODE_INDEX) ||
-                      (cur_player[player].position >= board_nr && (oldPosition % board_nr) < HOUSE_NODE_INDEX);
-     
-     //마지막 노드를 지났는지 확인 ( 첫 노드로 돌아가기)
-      if (cur_player[player].position >= board_nr){
-        cur_player[player].position %= board_nr;
-        //루프 하나를 완료 했을 때 첫 노드로 돌아가기 
-        }
-      
-      // 졸업여부확인
-      if(cur_player[player].accumCredit >= GRADUATE_CREDIT && passedHouse){
-        
-        //졸업했고, 하우스 노드에 도달(지나치면) 게임 종료 
-        printf("%s has won the game!\n", cur_player[player].name);
-        
+     // 집을 지났는지 확인  
+     bool passedHouse = (oldPosition < HOUSE_NODE_INDEX && player->position >= HOUSE_NODE_INDEX) ||
+                       (oldPosition > player->position); // Simplified loop check
+                       
+     if (passedHouse) {
+        replenishEnergyAtHouse(player);
+    }
+
+    // 졸업 여부 확인  
+    if (player->accumCredit >= GRADUATE_CREDIT && (passedHouse || player->position == HOUSE_NODE_INDEX)) {
+        printf("%s has won the game by reaching the House node with enough credits!\n", player->name);
         endGame();
         return;
-        } 
-        //기타 조건 추가할 경우 
-} 
+    }
+
+    //새로운 위치에서 노드 액션 수행 
+    actionNode(player);
+}
 
 //강의 수강 완료 시 등급 알려주는 기능 
 void printGrades(int player) 

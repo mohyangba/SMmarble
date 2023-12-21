@@ -4,6 +4,7 @@
 
 #include "game_logic.h"
 #include "smm_object.h" 
+#include "player.h" 
 
 void drawFoodCardAndReplenishEnergy(int player) {
     smmFoodCard_t* card = getRandomFoodCard();
@@ -34,11 +35,6 @@ void performExperiment(int player) {
         printf("Experiment continues. Player %s must stay in the laboratory.\n", cur_player[player].name);
         // The player remains in the laboratory
     }
-}
-
-void replenishEnergyAtHouse(int player) {
-    // Logic to replenish player's energy at the house
-    // ...
 }
 
 void performRandomMission(int player) {
@@ -88,19 +84,23 @@ void actionNode(int player)
     }
     break;
         case SMMNODE_TYPE_RESTAURANT:
-             printf("Player %s has arrived at the Restaurant node.\n", cur_player[player].name);
-            // Draw a random food card and replenish energy
-            drawFoodCardAndReplenishEnergy(player);
-            break;
+             {
+             int energyValue = smmObj_getNodeEnergy(boardPtr); // Get energy value from the node
+             cur_player[player].energy += energyValue; // Replenish player's energy
+
+             printf("Player %s has arrived at the Restaurant and replenishes %d energy. Total energy: %d.\n", 
+             cur_player[player].name, energyValue, cur_player[player].energy);
+
+             break;
+             }
         
         case SMMNODE_TYPE_LAB:
              printf("Player %s has arrived at the Laboratory node. Nothing happens here.\n", cur_player[player].name);
              break;
         
         case SMMNODE_TYPE_HOUSE:
-            // Replenish energy every time player passes the house
-            replenishEnergyAtHouse(player);
-            break;
+             printf("Player %s has arrived at the House.\n", cur_player[player].name);
+             break;
         
         case SMMNODE_TYPE_EXPERIMENT:
          performExperiment(player);
@@ -117,7 +117,7 @@ void actionNode(int player)
             break;
         
         case SMMNODE_TYPE_SNACKTIME:
-            // Similar to Restaurant: draw a random food card for energy
+            //draw a random food card for energy
             drawFoodCardAndReplenishEnergy(player);
             break;
         

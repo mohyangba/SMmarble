@@ -27,5 +27,6 @@ void generatePlayers(int n, int initEnergy);
 void printGrades(int player);
 void printPlayerStatus(void);
 // ... other player-related functions
+bool passesHouse(int oldPosition, int newPosition);
 
 #endif // PLAYER_H
