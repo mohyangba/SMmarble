@@ -34,29 +34,6 @@ char* smmObj_getTypeName(int type)
 }
 
 
-
-typedef enum smmObjGrade {
-    smmObjGrade_Ap = 0,
-    smmObjGrade_A0,
-    smmObjGrade_Am,
-    smmObjGrade_Bp,
-    smmObjGrade_B0,
-    smmObjGrade_Bm,
-    smmObjGrade_Cp,
-    smmObjGrade_C0,
-    smmObjGrade_Cm
-} smmObjGrade_e;
-
-//1. 구조체 형식 정의
-typedef struct smmObject {
-       char name[MAX_CHARNAME];
-       smmObjType_e objType; 
-       int type;
-       int credit;
-       int energy;
-       smmObjGrade_e grade;
-} smmObject_t;
-
 //smmObj_genFoodCard 함수 구현  
 smmFoodCard_t* smmObj_genFoodCard(char* name, int energy) {
     smmFoodCard_t* card = (smmFoodCard_t*)malloc(sizeof(smmFoodCard_t));
@@ -77,15 +54,6 @@ void loadFoodCards(const char* filename) {
     if (!file) {
         perror("Error opening file");
         return;
-    }
-
-    char foodName[MAX_CHARNAME];
-    void loadFoodCards(const char* filename) {
-    FILE* file = fopen(filename, "r");
-    
-    if (!file) {
-        fprintf(stderr, "Error opening file: %s\n", filename);
-        exit(EXIT_FAILURE); // or handle the error as per your game's design
     }
 
     char foodName[MAX_CHARNAME];
