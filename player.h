@@ -22,6 +22,9 @@ typedef struct player{
 void initializePlayer(Player *player, const char *name, int initEnergy);
 void goFoward(Player *player, int step);
 void updatePlayerStatus(Player *player);
+void generatePlayers(int n, int initEnergy);
+void printGrades(int player);
+void printPlayerStatus(void);
 // ... other player-related functions
 
 #endif // PLAYER_H

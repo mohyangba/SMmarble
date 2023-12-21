@@ -14,11 +14,8 @@
 #include "smm_common.h"
 #include "game_logic.h"
 
-
-
 #define BOARDFILEPATH "marbleBoardConfig.txt"
 #define FOODFILEPATH "marbleFoodConfig.txt"
-#define FESTFILEPATH "marbleFestivalConfig.txt"
 
 
 
@@ -52,89 +49,7 @@ void actionNode(int player) // 플레이어가 특정 노드 위에 도착했을 때 취하는 행동
 void endGame(void);//플레이어 승리 시 게임 종료  
 #endif
 
-void goForward(int player, int step)
-{
-     //플레이어의 현재 위치 업데이트
-     int oldPosition = cur_player[player].position;
-     cur_player[player].position += step;
-     
-     // Check if the player passed the Home node
-     bool passedHouse = (oldPosition < HOUSE_NODE_INDEX && cur_player[player].position >= HOUSE_NODE_INDEX) ||
-                      (cur_player[player].position >= board_nr && (oldPosition % board_nr) < HOUSE_NODE_INDEX);
-     
-     //마지막 노드를 지났는지 확인 ( 첫 노드로 돌아가기)
-      if (cur_player[player].position >= board_nr){
-        cur_player[player].position %= board_nr;
-        //루프 하나를 완료 했을 때 첫 노드로 돌아가기 
-        }
-      
-      // 졸업여부확인
-      if(cur_player[player].accumCredit >= GRADUATE_CREDIT && passedHouse){
-        
-        //졸업했고, 하우스 노드에 도달(지나치면) 게임 종료 
-        printf("%s has won the game!\n", cur_player[player].name);
-        
-        endGame();
-        return;
-        } 
-        //기타 조건 추가할 경우 
-} 
-
-void endGame() {
-    // Display final scores or messages
-    // Clean up resources if needed
-    // Ask if players want to play again or exit the game
-}                        
-     
-void printGrades(int player)
-{
-     int i;
-     void *gradePtr;
-     for (i=0;i<smmdb_len(LISTNO_OFFSET_GRADE + player);i++)
-     {
-         gradePtr = smmdb_getData(LISTNO_OFFSET_GRADE + player, i);
-         printf("%s : %i\n", smmObj_getNodeName(gradePtr), smmObj_getNodeGrade(gradePtr));
-     }
-}
-
-void printPlayerStatus(void)
-{
-     int i;
-     
-     for (i=0;i<player_nr;i++)
-     {
-         printf("%s : credit %i, energy %i, position %i\n", 
-                      cur_player[i].name,
-                      cur_player[i].accumCredit,
-                      cur_player[i].energy,
-                      cur_player[i].position);
-     }
-}
-
-void generatePlayers(int n, int initEnergy) //generate a new player
-{
-     int i;
-     //n time loop
-     for (i=0;i<n;i++)
-     {
-         //input name
-         printf("Input player %i's name:", i); //¾E³≫ ¹®±¸ 
-         scanf("%s", cur_player[i].name);
-         fflush(stdin);
-         
-         //set position
-         //player_position[i] = 0;
-         cur_player[i].position = 0;
-         
-         //set energy
-         //player_energy[i] = initEnergy;
-         cur_player[i].energy = initEnergy;
-         cur_player[i].accumCredit = 0;
-         cur_player[i].flag_graduate = 0;
-     }
-}
-
-
+                   
 int rolldie(int player)
 {
     char c;
@@ -253,8 +168,8 @@ int main(int argc, const char * argv[]) {
     festival_nr = 0;
     
     srand(time(NULL));
-    
-    
+    //foodcard need to be loaded
+    void loadFoodCards(const char* filename)
     //1. import parameters ---------------------------------------------------------------------------------
     //1-1. boardConfig 
     if ((fp = fopen(BOARDFILEPATH,"r")) == NULL)

@@ -70,6 +70,7 @@ smmFoodCard_t* smmObj_genFoodCard(char* name, int energy) {
 //음식 카드 관련 함수 정의  
 static smmFoodCard_t* foodCards[MAX_FOOD_CARDS];
 static int foodCardCount = 0;
+
        //1)파일에서 음식 카드 불러오기 
 void loadFoodCards(const char* filename) {
     FILE* file = fopen(filename, "r");
@@ -79,9 +80,25 @@ void loadFoodCards(const char* filename) {
     }
 
     char foodName[MAX_CHARNAME];
+    void loadFoodCards(const char* filename) {
+    FILE* file = fopen(filename, "r");
+    
+    if (!file) {
+        fprintf(stderr, "Error opening file: %s\n", filename);
+        exit(EXIT_FAILURE); // or handle the error as per your game's design
+    }
+
+    char foodName[MAX_CHARNAME];
     int energy;
+
     while (foodCardCount < MAX_FOOD_CARDS && fscanf(file, "%s %d", foodName, &energy) == 2) {
         foodCards[foodCardCount++] = smmObj_genFoodCard(foodName, energy);
+    }
+
+    if (ferror(file)) {
+        fprintf(stderr, "Error reading from file: %s\n", filename);
+        fclose(file);
+        exit(EXIT_FAILURE); // or handle the error as per your game's design
     }
 
     fclose(file);
@@ -89,8 +106,7 @@ void loadFoodCards(const char* filename) {
        //2}음식 카드 중 무작위 선택 (음식카드배열이 이미 채워져있다는 가정 하에)
 smmFoodCard_t* getRandomFoodCard() {
     if (foodCardCount == 0) return NULL;
-
-    srand(time(NULL)); // 난수생성 ->main으로 옮기고 여기는 삭제  
+ 
     int index = rand() % foodCardCount;
     return foodCards[index];
 }
