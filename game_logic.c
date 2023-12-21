@@ -14,33 +14,47 @@ void actionNode(int player)
     int type = smmObj_getNodeType( boardPtr );
     char *name = smmObj_getNodeName( boardPtr );
     void *gradePtr;
+    
      //노드별 액션 처리 
     switch(type)
     {
         //case lecture:
         case SMMNODE_TYPE_LECTURE:
-             //플레이어의 에너지가 충분한지 검사  
-             if (cur_player[player].energy >= some_energy_threshold)
-             {
-             cur_player[player].accumCredit += smmObj_getNodeCredit( boardPtr );
-             cur_player[player].energy -= smmObj_getNodeEnergy( boardPtr );
-             } else {
-                    //플레이어 에너지가 충분하지 않은 경우
-             } 
-            //grade generation
-            gradePtr = smmObj_genObject(name, smmObjType_grade, 0, smmObj_getNodeCredit( boardPtr ), 0, ??);
-            smmdb_addTail(LISTNO_OFFSET_GRADE + player, gradePtr);
-            
-            break;
+             //플레이어 에너지 확인 
+    if (cur_player[player].energy >= some_energy_threshold) {
+       printf("Player %s has arrived at the Lecture node.\n", cur_player[player].name);
+        printf("Do you want to take the lecture at %s? (Y/N): ", name); //수강여부 
+        char choice;
+        scanf(" %c", &choice); 
         
+        //수강한 경우 
+        if (choice == 'Y' || choice == 'y') {
+            cur_player[player].accumCredit += smmObj_getNodeCredit(boardPtr);
+            cur_player[player].energy -= smmObj_getNodeEnergy(boardPtr);
+            
+            printf("You have taken the lecture. Credits: %d, Remaining Energy: %d\n", 
+                   cur_player[player].accumCredit, cur_player[player].energy);
+
+            // 성적 생성 
+            gradePtr = smmObj_genObject(name, smmObjType_grade, 0, smmObj_getNodeCredit(boardPtr), 0, /* grade value */);
+            smmdb_addTail(LISTNO_OFFSET_GRADE + player, gradePtr);
+        //수강하지 않은 경우 
+        } else {
+            printf("You chose not to take the lecture.\n");
+        }
+    } else {
+        printf("Not enough energy to take the lecture at %s.\n", name);
+    }
+    break;
         case SMMNODE_TYPE_RESTAURANT:
+             printf("Player %s has arrived at the Restaurant node.\n", cur_player[player].name);
             // Draw a random food card and replenish energy
             drawFoodCardAndReplenishEnergy(player);
             break;
         
         case SMMNODE_TYPE_LAB:
-            // Laboratory logic: no action if just arrived
-            break;
+             printf("Player %s has arrived at the Laboratory node. Nothing happens here.\n", cur_player[player].name);
+             break;
         
         case SMMNODE_TYPE_HOUSE:
             // Replenish energy every time player passes the house
@@ -68,13 +82,13 @@ void actionNode(int player)
 }
 
 
-void drawFoodCardAndReplenishEnergy(Player* player) {
+void drawFoodCardAndReplenishEnergy(int player) {
     smmFoodCard_t* card = getRandomFoodCard();
     if (card != NULL) {
-        player->energy += card->energy;  // Recharge energy
-        printf("You drew a %s card and gained %d energy!\n", card->name, card->energy);
+        cur_player[player].energy += card->energy;  // Recharge energy
+        printf("%s drew a %s card and gained %d energy!\n", cur_player[player].name, card->name, card->energy);
     } else {
-        printf("No more food cards left!\n");
+        printf("%s attempted to draw a food card but there were none left!\n", cur_player[player].name);
     }
 }
 
