@@ -56,6 +56,7 @@ int rolldie(int player)
     printf(" Press any key to roll a die (press g to see grade): ");
     c = getchar();
     fflush(stdin);
+}
     
 #if 1
     if (c == 'g')

@@ -5,6 +5,47 @@
 #include "game_logic.h"
 #include "smm_object.h" 
 
+void drawFoodCardAndReplenishEnergy(int player) {
+    smmFoodCard_t* card = getRandomFoodCard();
+    if (card != NULL) {
+        cur_player[player].energy += card->energy;  // Recharge energy
+        printf("%s drew a %s card and gained %d energy!\n", cur_player[player].name, card->name, card->energy);
+    } else {
+        printf("%s attempted to draw a food card but there were none left!\n", cur_player[player].name);
+    }
+}
+
+//실험중 상태  
+void performExperiment(int player) {
+    printf("Player %s is in the laboratory, conducting an experiment.\n", cur_player[player].name);
+
+    // Mark the player as in the experiment state
+    cur_player[player].inExperiment = 1;
+
+    // Roll the die to determine the outcome of the experiment
+    int diceRoll = rolldie(player);
+    printf("Player %s rolls a %d in the experiment.\n", cur_player[player].name, diceRoll);
+
+    if (diceRoll >= EXPERIMENT_SUCCESS_THRESHOLD) {
+        printf("Experiment successful! Player %s exits the laboratory.\n", cur_player[player].name);
+        // Exit experimenting state
+        cur_player[player].inExperiment = 0;
+    } else {
+        printf("Experiment continues. Player %s must stay in the laboratory.\n", cur_player[player].name);
+        // The player remains in the laboratory
+    }
+}
+
+void replenishEnergyAtHouse(int player) {
+    // Logic to replenish player's energy at the house
+    // ...
+}
+
+void performRandomMission(int player) {
+    // Logic to handle random missions
+    // ...
+}
+
 //action code when a player stays at a node
 void actionNode(int player)
 {
@@ -81,16 +122,6 @@ void actionNode(int player)
     }
 }
 
-
-void drawFoodCardAndReplenishEnergy(int player) {
-    smmFoodCard_t* card = getRandomFoodCard();
-    if (card != NULL) {
-        cur_player[player].energy += card->energy;  // Recharge energy
-        printf("%s drew a %s card and gained %d energy!\n", cur_player[player].name, card->name, card->energy);
-    } else {
-        printf("%s attempted to draw a food card but there were none left!\n", cur_player[player].name);
-    }
-}
 
 void endGame() {
     // Display final scores or messages
