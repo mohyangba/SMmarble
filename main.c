@@ -17,6 +17,7 @@
 
 #define BOARDFILEPATH "marbleBoardConfig.txt"
 #define FOODFILEPATH "marbleFoodConfig.txt"
+#define MAX_FOOD_CARDS 100
 
 
 
