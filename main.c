@@ -2,7 +2,7 @@
 //  main.c
 //  SMMarble
 //
-//  Created by Juyeop Kim on 2023/11/05.
+//
 //
 
 #include <time.h>
@@ -12,6 +12,8 @@
 #include "smm_object.h"
 #include "smm_database.h"
 #include "smm_common.h"
+#include "game_logic.h"
+
 
 
 #define BOARDFILEPATH "marbleBoardConfig.txt"
@@ -29,7 +31,7 @@ static int player_nr;
 
 
 typedef struct player {
-        int energy;
+        int energy; 
         int position;
         char name[MAX_CHARNAME];
         int accumCredit;
@@ -148,11 +150,53 @@ void actionNode(int player)
             smmdb_addTail(LISTNO_OFFSET_GRADE + player, gradePtr);
             
             break;
-            
-        default:
+        
+        case RESTAURANT_NODE:
+            // Draw a random food card and replenish energy
+            drawFoodCardAndReplenishEnergy(player);
+            break;
+        
+        case LABORATORY_NODE:
+            // Laboratory logic: no action if just arrived
+            break;
+        
+        case HOUSE_NODE:
+            // Replenish energy every time player passes the house
+            replenishEnergyAtHouse(player);
+            break;
+        
+        case EXPERIMENT_NODE:
+            // Handle experiment logic: spend energy, conduct experiment
+            performExperiment(player);
+            break;
+        
+        case SNACK_TIME_NODE:
+            // Similar to Restaurant: draw a random food card for energy
+            drawFoodCardAndReplenishEnergy(player);
+            break;
+        
+        case MISSION_NODE:
+            // Random mission logic: implement various missions
+            performRandomMission(player);
+            break;
+     
+     default:
             break;
     }
 }
+
+
+
+// Example implementation for drawing food card and replenishing energy
+void drawFoodCardAndReplenishEnergy(Player* player) {
+    smmFoodCard_t* card = getRandomFoodCard();
+    if (card != NULL) {
+        player->energy += card->energy;  // Recharge energy
+        printf("You drew a %s card and gained %d energy!\n", card->name, card->energy);
+    }
+}
+
+// ... implementations for replenishEnergyAtHouse, performExperiment, performRandomMission
 
 void goForward(int player, int step)
 {
@@ -270,15 +314,12 @@ int main(int argc, const char * argv[]) {
     generatePlayers(player_nr, initEnergy);
     
     
-    
-    
-    
     //3. SM Marble game starts ---------------------------------------------------------------------------------
-    while (1) //is anybody graduated?
+    while (1) //is anybody graduated? 게임이 종료되지 않을 조건  
     {
         int die_result;
         
-        
+        //GAME LOOP
         //4-1. initial printing
         printPlayerStatus();
         

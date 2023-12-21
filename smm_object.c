@@ -2,7 +2,7 @@
 //  smm_object.c
 //  SMMarble
 //
-//  Created by Juyeop Kim on 2023/11/05.
+//  
 //
 
 #include <stdlib.h>
@@ -90,7 +90,7 @@ void loadFoodCards(const char* filename) {
 smmFoodCard_t* getRandomFoodCard() {
     if (foodCardCount == 0) return NULL;
 
-    srand(time(NULL)); // 난수생성 ->main으제로 옮기고 여기는 삭 
+    srand(time(NULL)); // 난수생성 ->main으로 옮기고 여기는 삭제  
     int index = rand() % foodCardCount;
     return foodCards[index];
 }

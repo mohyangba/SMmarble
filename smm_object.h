@@ -2,7 +2,7 @@
 //  smm_object.h
 //  SMMarble object
 //
-//  Created by Juyeop Kim on 2023/11/05.
+//
 //
 
 #ifndef smm_object_h
